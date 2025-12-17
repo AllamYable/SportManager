@@ -38,11 +38,10 @@ CREATE TABLE IF NOT EXISTS joueur (
     endurance INTEGER,
     force INTEGER,
     technique INTEGER,
-    blesse INTEGER DEFAULT 0,
+    blesse BOOLEAN DEFAULT false,
     date_blessure DATETIME,
     matchs_absence INTEGER DEFAULT 0,
     id_equipe INTEGER NOT NULL,
-    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_equipe) REFERENCES equipe(id_equipe) ON DELETE CASCADE,
     FOREIGN KEY (id_poste) REFERENCES poste(id_poste) ON DELETE RESTRICT
 );
