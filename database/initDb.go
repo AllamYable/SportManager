@@ -3,7 +3,7 @@ package database
 import "database/sql"
 
 // CreateSchema crée les tables nécessaires dans la base de données si elles n'existent pas déjà.
-func CreerSchema(db *sql.DB) error {
+func InitDatabase(db *sql.DB) error {
 	schema :=
 
 	`

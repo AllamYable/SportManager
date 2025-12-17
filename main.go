@@ -18,5 +18,9 @@ func main () {
 	}
 	defer db.Close() 
 
-	database.CreerSchema(db)
+	err = database.InitDatabase(db)
+	if err != nil{
+		fmt.Println("Erreur Init DB:",err)
+	}
+	database.PushDatabase(db)
 }
