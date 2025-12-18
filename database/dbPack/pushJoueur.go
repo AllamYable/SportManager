@@ -36,7 +36,7 @@ func PushJoueur(db *sql.DB) {
 		('Mayeur', 'Lucie', 24, 0, 5, 5, 20, 5, false, null, 0, 5),
 		('Cichy', 'Dominique', 64, 2, 60, 60, 30, 70, false, null, 0, 5),
 		('Himana', 'Iqbal', 31, 1, 30, 70, 70, 20, false, null, 0, 5),
-		('Leroux', 'Jean-Claude', 59, 1, 30, 70, 70, 20, false, null, 0, 5),
+		('Leroux', 'Jean-Claude', 59, 2, 60, 60, 30, 70, false, null, 0, 5),
 		('Belhadji', 'Chadia', 45, 1, 30, 70, 70, 20, false, null, 0, 5);
     `)
 	if err != nil {
