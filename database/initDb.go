@@ -7,7 +7,7 @@ func InitDatabase(db *sql.DB) error {
 	schema :=
 
 	`
-	CREATE TABLE IF NOT EXISTS equipe (
+CREATE TABLE IF NOT EXISTS equipe (
     id_equipe INTEGER PRIMARY KEY AUTOINCREMENT,
     nom_equipe TEXT NOT NULL UNIQUE,
     coach TEXT NOT NULL,
@@ -96,6 +96,7 @@ CREATE TABLE IF NOT EXISTS blessure (
     date_guerison DATETIME,
     FOREIGN KEY (id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE,
     FOREIGN KEY (id_match) REFERENCES match(id_match) ON DELETE CASCADE
+);
 `
 	_, err := db.Exec(schema)
 	return err

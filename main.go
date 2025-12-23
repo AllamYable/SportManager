@@ -20,20 +20,26 @@ func main () {
 	}
 	defer db.Close()
 
-	err = database.InitDatabase(db)
-	if err != nil{
-		fmt.Println("Erreur Init DB:",err)
-	}
-	database.PushDatabase(db)
-
 	answer := game.DisplayMenu()
 
 	switch answer {
 		case 1 :
-			fmt.Println("Lancement de la partie...")
+			fmt.Println("> Lancement de la partie...")
 		case 2 :
-			fmt.Println("Ouverture des options...")
+			fmt.Println("> Ouverture des options...")
+			answer = game.DisplayOptions()
+			switch answer {
+				case 1 :
+					fmt.Println("> Ouverture de l'historique...")
+				case 2 :
+					fmt.Println("> Reset de la BDD...")
+					err = database.ResetDatabase(db) 
+					if err != nil{ fmt.Println("Erreur Reset DB:",err) }
+				}
+				default :
+					break
+
 		case 3 :
-			fmt.Println("Affichage des règles")
+			fmt.Println("> Affichage des règles")
 	}
 }
