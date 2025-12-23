@@ -31,7 +31,7 @@ func main() {
 			fmt.Println("> Création d'un MATCH")
 		case 2:
 			fmt.Println("> Géstion de l'équipe")
-
+			answer = game.DisplayConsulterEquipe()
 		default:
 			break
 		}
@@ -54,5 +54,7 @@ func main() {
 	case 3:
 		fmt.Println("> Affichage des règles")
 		game.DisplayRules()
+
+
 	}
 }

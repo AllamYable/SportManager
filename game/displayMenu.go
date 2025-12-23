@@ -22,3 +22,4 @@ func DisplayMenu() int {
 
 	return answer
 }
+
