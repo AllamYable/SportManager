@@ -27,17 +27,17 @@ func PushJoueur(db *sql.DB) {
 		('Fab', 'Léo', 25, 0, 5, 5, 20, 5, false, null, 0, 3),
 		('Prussel', 'Loïc', 35, 2, 60, 60, 30, 70, false, null, 0, 3),
 
-		('Grade', 'Julien', 30, 0, 5, 5, 20, 5, false, null, 0, 4), -- vane sur du sql
-		('Lenglet', 'Julien', 30, 1, 30, 70, 70, 20, false, null, 0, 4),
-		('lallain', 'Clément', 30, 2, 60, 60, 30, 70, false, null, 0, 4),
-		('Laplume', 'Etienne', 33, 2, 60, 60, 30, 70, false, null, 0, 4), -- attaque le réseau
-		('Galice', 'Lucie', 35, 1, 30, 70, 70, 20, false, null, 0, 4),
+		('Mayeur', 'Lucie', 24, 0, 5, 5, 20, 5, false, null, 0, 4),
+		('Cichy', 'Dominique', 64, 2, 60, 60, 30, 70, false, null, 0, 4),
+		('Himana', 'Iqbal', 31, 1, 30, 70, 70, 20, false, null, 0, 4),
+		('Leroux', 'Jean-Claude', 59, 2, 60, 60, 30, 70, false, null, 0, 4),
+		('Belhadji', 'Chadia', 45, 1, 30, 70, 70, 20, false, null, 0, 4),
 
-		('Mayeur', 'Lucie', 24, 0, 5, 5, 20, 5, false, null, 0, 5),
-		('Cichy', 'Dominique', 64, 2, 60, 60, 30, 70, false, null, 0, 5),
-		('Himana', 'Iqbal', 31, 1, 30, 70, 70, 20, false, null, 0, 5),
-		('Leroux', 'Jean-Claude', 59, 2, 60, 60, 30, 70, false, null, 0, 5),
-		('Belhadji', 'Chadia', 45, 1, 30, 70, 70, 20, false, null, 0, 5);
+		('Grade', 'Julien', 30, 0, 5, 5, 20, 5, false, null, 0, 5), -- vane sur du sql
+		('Lenglet', 'Julien', 30, 1, 30, 70, 70, 20, false, null, 0, 5),
+		('Lallain', 'Clément', 30, 2, 60, 60, 30, 70, false, null, 0, 5),
+		('Laplume', 'Etienne', 33, 2, 60, 60, 30, 70, false, null, 0, 5), -- attaque le réseau
+		('Galice', 'Lucie', 35, 1, 30, 70, 70, 20, false, null, 0, 5);
     `)
 	if err != nil {
 		fmt.Println("Error in pushJoueur.go :", err)

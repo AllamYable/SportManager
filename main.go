@@ -30,8 +30,15 @@ func main() {
 		case 1:
 			fmt.Println("> Création d'un MATCH")
 		case 2:
-			fmt.Println("> Géstion de l'équipe")
+			fmt.Println("> Gestion de l'équipe")
 			answer = game.DisplayConsulterEquipe()
+		switch answer {
+		case 1:
+
+		case 2:
+			fmt.Println("> Modifier les joueurs de CESI")
+			answer = game.DisplayModifierJoueur(db)
+		}
 		default:
 			break
 		}
