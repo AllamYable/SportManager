@@ -53,5 +53,6 @@ func main() {
 
 	case 3:
 		fmt.Println("> Affichage des règles")
+		game.DisplayRules()
 	}
 }
