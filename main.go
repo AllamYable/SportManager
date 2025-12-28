@@ -35,7 +35,7 @@ func main() {
 				switch answer {
 					case 1:
 						fmt.Println("> Modifier l équipe CESI")
-						answer = game.DisplayModifierEquipe(db)
+						game.DisplayModifierEquipe(db)
 					case 2:
 						fmt.Println("> Modifier les joueurs de CESI")
 						answer = game.DisplayModifierJoueur(db)
