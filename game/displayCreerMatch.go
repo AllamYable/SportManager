@@ -4,6 +4,8 @@ import (
     "database/sql"
     "fmt"
     "math"
+    "math/rand"
+    "time"
 )
 
 // --- Menu ASCII + déclenchement de la création de match ---
@@ -86,6 +88,45 @@ func DisplayCreationMatch(db *sql.DB) {
         return
     }
 
+    idCesi, err := ObtenirEquipeCesiID(db)
+    if err != nil {
+        fmt.Println("Impossible de trouver l'équipe CESI :", err)
+        return
+    }
+
+    // -- Check si un joueur est blessé
+    joueurBlesseId := 0
+    temps := 0
+    boolBlesse := false
+    err = db.QueryRow(`
+		SELECT id_joueur, matchs_absence FROM joueur
+		WHERE id_equipe = ? and blesse = true
+	`, idCesi).Scan(&joueurBlesseId, &temps)
+	if err != nil {
+		fmt.Println("Erreur récup id joueur blesse:", err)
+	}
+    if temps != 0 {
+        fmt.Println("Oops, un joueur dans l'équipe est blessé, rendez-vous demain !")
+
+        if temps != 1 {
+            boolBlesse = true
+        }
+        temps --
+
+        _, err = db.Exec(`
+            UPDATE joueur
+            SET blesse = ?, matchs_absence = ?
+            WHERE id_joueur = ?;
+        `, boolBlesse, temps, joueurBlesseId)
+        if err != nil {
+            fmt.Println("Erreur lors de la mise à jour du joueur pour sa blessure :", err)
+            return
+        }
+
+        return
+    }
+
+
     fmt.Println("=== Choisissez l'équipe adverse ===")
     for _, e := range equipes {
         fmt.Printf("ID: %d | %s\n", e.ID, e.Nom)
@@ -104,12 +145,6 @@ func DisplayCreationMatch(db *sql.DB) {
     }
     if !existe {
         fmt.Println("ID d'équipe adverse invalide.")
-        return
-    }
-
-    idCesi, err := ObtenirEquipeCesiID(db)
-    if err != nil {
-        fmt.Println("Impossible de trouver l'équipe CESI :", err)
         return
     }
 
@@ -133,7 +168,6 @@ func DisplayCreationMatch(db *sql.DB) {
 
     // Saisie et enregistrement du score + mise à jour compteurs + points joueurs
     SaisirScoreMatch(db, int(matchID), idCesi, idAdverse)
-    randomBlessure(db, int(matchID), idCesi, idAdverse)
 }
 
 // Saisie du score : CESI à gauche, adverse à droite, puis UPDATE du match
@@ -178,6 +212,7 @@ func SaisirScoreMatch(db *sql.DB, matchID int, idCesi int, idAdverse int) {
 
     // -- Modif niveau global de l'equipe CESI (1) et l'autre (2) : 
     eloUpdate(db, idCesi, idAdverse, scoreCesi, scoreAdv)
+    randomBlessure(db, idCesi, idAdverse, scoreCesi, scoreAdv)
 }
 
 // Mise à jour des compteurs d'une équipe : nb_matchs, nb_victoires, nb_defaites
@@ -387,6 +422,75 @@ func eloUpdate(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv in
     }
 }   
 
-func randomBlessure(db *sql.DB, matchID int, idCesi int, idAdverse int) {
-    fmt.Println("Aucune Blessure durant ce match.")
+func randomBlessure(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv int) {
+    
+    // -- Choisir un player random
+
+    var idJoueurPick int
+
+    rand.Seed(time.Now().UnixNano())
+
+	offset := rand.Intn(5)
+
+    err := db.QueryRow(`
+        SELECT id_joueur
+        FROM joueur
+        WHERE id_equipe = ?
+        LIMIT 1
+        OFFSET ?;
+    `, idCesi, offset).Scan(&idJoueurPick)
+    if err != nil {
+            fmt.Println("Erreur lors de la récupération d'un joueur random :", err)
+    }
+
+	var vitesse int
+	var endurance int
+	var force int
+	var technique int
+    var prenomJoueur string
+    var nomJoueur string 
+
+    err = db.QueryRow(`
+		SELECT vitesse, endurance, force, technique, prenom_joueur, nom_joueur FROM joueur j
+		WHERE id_joueur = ?
+	`, idJoueurPick).Scan(&vitesse, &endurance, &force, &technique, &prenomJoueur, &nomJoueur)
+	if err != nil {
+		fmt.Println("Erreur:", err)
+	}
+
+    odds := 0
+
+    if scoreCesi > 3 {
+        odds ++
+    }
+    if endurance > 75 {
+        odds ++
+    }
+    if vitesse > 75 {
+        odds ++
+    }
+    if force > 80 {
+        odds ++
+    }
+    if technique > 75 {
+        odds ++
+    }
+
+    result := rand.Intn(10) < odds
+
+    if result {
+        fmt.Println("Le joueur ", prenomJoueur, " ", nomJoueur, " est blesse pendant 3 matchs")
+
+        _, err = db.Exec(`
+            UPDATE joueur
+            SET blesse = true, matchs_absence = 3
+            WHERE id_joueur = ?;
+        `, idJoueurPick)
+        if err != nil {
+            fmt.Println("Erreur lors de la mise à jour du joueur pour sa blessure :", err)
+            return
+        }
+        
+    } else { fmt.Println("Aucune Blessure durant ce match.") }
+
 }

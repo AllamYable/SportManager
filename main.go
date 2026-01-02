@@ -5,6 +5,7 @@ import (
     "fmt"
     "sportmanager/database"
     "sportmanager/game"
+    "os"
 
     _ "modernc.org/sqlite"
 )
@@ -20,51 +21,58 @@ func main() {
     }
     defer db.Close()
 
-    answer := game.DisplayMenu()
+    for true {
 
-    switch answer {
-    case 1: // -- Jouer
-        fmt.Println("> Lancement de la partie...")
-        answer = game.DisplayJouer()
+        answer := game.DisplayMenu()
+
         switch answer {
-        case 1:
-            fmt.Println("> Création d'un MATCH")
-            // -- Création d'un match (menu ASCII + choix équipe adverse + insertion en BDD)
-            game.DisplayCreerMatch(db)
-
-        case 2:
-            fmt.Println("> Gestion de l'équipe")
-            answer = game.DisplayConsulterEquipe()
+        case 1: // -- Jouer
+            fmt.Println("> Lancement de la partie...")
+            answer = game.DisplayJouer()
             switch answer {
             case 1:
-                fmt.Println("> Modifier l équipe CESI")
-                game.DisplayModifierEquipe(db)
+                fmt.Println("> Création d'un MATCH")
+                // -- Création d'un match (menu ASCII + choix équipe adverse + insertion en BDD)
+                game.DisplayCreerMatch(db)
+
             case 2:
-                fmt.Println("> Modifier les joueurs de CESI")
-                answer = game.DisplayModifierJoueur(db)
+                fmt.Println("> Gestion de l'équipe")
+                answer = game.DisplayConsulterEquipe()
+                switch answer {
+                case 1:
+                    fmt.Println("> Modifier l équipe CESI")
+                    game.DisplayModifierEquipe(db)
+                case 2:
+                    fmt.Println("> Modifier les joueurs de CESI")
+                    answer = game.DisplayModifierJoueur(db)
+                }
+            default:
+                break
             }
-        default:
-            break
+
+        case 2: // -- Options
+            fmt.Println("> Ouverture des options...")
+            answer = game.DisplayOptions()
+            switch answer {
+            case 1:
+                fmt.Println("> Ouverture de l'historique...")
+            case 2:
+                fmt.Println("> Reset de la BDD...")
+                err = database.ResetDatabase(db)
+                if err != nil {
+                    fmt.Println("Erreur Reset DB:", err)
+                }
+            default:
+                break
+            }
+
+        case 3:
+            fmt.Println("> Affichage des règles")
+            game.DisplayRules()
+        
+        default: 
+            os.Exit(0)
         }
 
-    case 2: // -- Options
-        fmt.Println("> Ouverture des options...")
-        answer = game.DisplayOptions()
-        switch answer {
-        case 1:
-            fmt.Println("> Ouverture de l'historique...")
-        case 2:
-            fmt.Println("> Reset de la BDD...")
-            err = database.ResetDatabase(db)
-            if err != nil {
-                fmt.Println("Erreur Reset DB:", err)
-            }
-        default:
-            break
-        }
-
-    case 3:
-        fmt.Println("> Affichage des règles")
-        game.DisplayRules()
     }
 }
