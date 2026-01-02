@@ -28,8 +28,6 @@ func DisplayCreerMatch(db *sql.DB) {
     if answer == 1 {
         DisplayCreationMatch(db)
     }
-
-    return
 }
 
 // Structure et fonctions BDD pour la création du match
@@ -135,6 +133,7 @@ func DisplayCreationMatch(db *sql.DB) {
 
     // Saisie et enregistrement du score + mise à jour compteurs + points joueurs
     SaisirScoreMatch(db, int(matchID), idCesi, idAdverse)
+    randomBlessure(db, int(matchID), idCesi, idAdverse)
 }
 
 // Saisie du score : CESI à gauche, adverse à droite, puis UPDATE du match
@@ -387,3 +386,7 @@ func eloUpdate(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv in
         return
     }
 }   
+
+func randomBlessure(db *sql.DB, matchID int, idCesi int, idAdverse int) {
+    fmt.Println("Aucune Blessure durant ce match.")
+}
