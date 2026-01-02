@@ -3,10 +3,11 @@ package game
 import (
     "database/sql"
     "fmt"
+    "math"
 )
 
 // --- Menu ASCII + déclenchement de la création de match ---
-func DisplayCreerMatch(db *sql.DB) int {
+func DisplayCreerMatch(db *sql.DB) {
     var answer int
     optionJouer := `
     +-------------------------------------------------------------+
@@ -15,9 +16,8 @@ func DisplayCreerMatch(db *sql.DB) int {
     |    Jouer   ══════╗                                          |
     |    Option        ▼                                          |
     |    À Propos      Créer un match !  ════════════════╗        |
-    |    Sortir        Consulter son équipe                       |
-    |                  Retour au menu                    ▼        |
-    |                                          1. Créer un match  |
+    |    Sortir        Consulter son équipe              ▼        |
+    |                  Retour au menu          1. Créer un match  |
     |                                          2. Retour jouer    |
     +-------------------------------------------------------------+
     `
@@ -29,7 +29,7 @@ func DisplayCreerMatch(db *sql.DB) int {
         DisplayCreationMatch(db)
     }
 
-    return answer
+    return
 }
 
 // Structure et fonctions BDD pour la création du match
@@ -176,6 +176,9 @@ func SaisirScoreMatch(db *sql.DB, matchID int, idCesi int, idAdverse int) {
 
     // Attribution des points de compétence aux joueurs de CESI
     DistribuerPointsJoueurs(db, matchID, idCesi)
+
+    // -- Modif niveau global de l'equipe CESI (1) et l'autre (2) : 
+    eloUpdate(db, idCesi, idAdverse, scoreCesi, scoreAdv)
 }
 
 // Mise à jour des compteurs d'une équipe : nb_matchs, nb_victoires, nb_defaites
@@ -287,4 +290,100 @@ func demanderPoints(nomStat string, pointsDisponibles int) int {
     }
 }
 
-// Insérer l'elo update et ne pas oublier de faire le format aléatoire de blessure
+// Insérer le format aléatoire de blessure
+
+func eloUpdate(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv int) {
+    // recup score global : 
+
+    var levelCESI float64
+    var levelADV float64
+
+    var resultatEloCesi float64
+    var resultatEloAdv float64
+    var probaEquipeCesiWin float64
+    var probaEquipeAdvWin float64
+    poids := 30.0
+
+    var resultatReelCesi float64
+    var resultatReelAdv float64
+
+
+    err := db.QueryRow(`
+        SELECT niveau_global
+        FROM equipe
+        WHERE id_equipe = ?;
+    `, idCesi).Scan(&levelCESI)
+    if err != nil {
+            fmt.Println("Erreur lors de la récupération niveau equipe CESI :", err)
+    }
+    err = db.QueryRow(`
+        SELECT niveau_global
+        FROM equipe
+        WHERE id_equipe = ?;
+    `, idAdverse ).Scan(&levelADV)
+    if err != nil {
+            fmt.Println("Erreur lors de la récupération niveau equipe ADV :", err)
+    }
+
+
+    // -- Proba que CESI gagne : 
+
+    var base float64
+    base = 10
+    exposant := (levelADV-levelCESI)/400
+    exposant64 := float64(exposant)
+    result := math.Pow(base, exposant64)
+
+    probaEquipeCesiWin = 1/(1+result)
+
+    // -- Proba que ADV gagne : 
+
+    probaEquipeAdvWin = 1-probaEquipeCesiWin
+
+    fmt.Println("Proba CESI win : ", probaEquipeCesiWin, " vs ", probaEquipeAdvWin)
+
+    // -- Resultat Float : 
+    if scoreCesi > scoreAdv {
+        resultatReelCesi = 1
+    } else if scoreCesi < scoreAdv {
+        resultatReelCesi = 0
+    } else {
+        resultatReelCesi = 0.5
+    }
+
+    resultatReelAdv = 1 - resultatReelCesi
+
+    // -- MAJ rating :
+    resultatEloCesi = levelCESI + (poids * (resultatReelCesi-probaEquipeCesiWin))
+    resultatEloAdv = levelADV + (poids * (resultatReelAdv-probaEquipeAdvWin))
+
+    fmt.Println("Elo CESI avant : ", levelCESI, " après : ", resultatEloCesi)
+    fmt.Println("Elo ADV avant : ", levelADV, " après : ", resultatEloAdv)
+
+    var eloCesiFinal int
+    var eloAdvFinal int
+
+    eloCesiFinal = int(math.Round(resultatEloCesi))
+    eloAdvFinal = int(math.Round(resultatEloAdv))
+
+    // -- push sur la BDD : 
+
+    _, err = db.Exec(`
+        UPDATE equipe
+        SET niveau_global = ?
+        WHERE id_equipe = ?;
+    `, eloCesiFinal, idCesi)
+    if err != nil {
+        fmt.Println("Erreur lors de la mise à jour du ELO equipe CESI :", err)
+        return
+    }
+    _, err = db.Exec(`
+        UPDATE equipe
+        SET niveau_global = ?
+        WHERE id_equipe = ?;
+    `, eloAdvFinal, idAdverse)
+    if err != nil {
+        fmt.Println("Erreur lors de la mise à jour du ELO equipe adverse :", err)
+        return
+    }
+}   
