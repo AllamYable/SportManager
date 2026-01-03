@@ -210,7 +210,7 @@ func SaisirScoreMatch(db *sql.DB, matchID int, idCesi int, idAdverse int) {
     // Attribution des points de compétence aux joueurs de CESI
     DistribuerPointsJoueurs(db, matchID, idCesi)
 
-    // -- Modif niveau global de l'equipe CESI (1) et l'autre (2) : 
+    // -- Modif niveau global de l'equipe CESI (1) et l'autre (2) :
     eloUpdate(db, idCesi, idAdverse, scoreCesi, scoreAdv)
     randomBlessure(db, idCesi, idAdverse, scoreCesi, scoreAdv)
 }
@@ -249,7 +249,6 @@ func MettreAJourCompteursEquipe(db *sql.DB, idEquipe int, scoreEquipe int, score
     }
 }
 
-// Distribution de 20 points (max 5 par stat par joueur) pour les joueurs de CESI
 func DistribuerPointsJoueurs(db *sql.DB, matchID int, idCesi int) {
     // Récupérer les joueurs de CESI
     joueurs, err := ObtenirJoueursCesi(db)
@@ -268,25 +267,25 @@ func DistribuerPointsJoueurs(db *sql.DB, matchID int, idCesi int) {
         fmt.Printf("\n--- %s %s (VIT:%d END:%d FOR:%d TEC:%d) ---\n", j.Prenom, j.Nom, j.Vitesse, j.Endurance, j.Force, j.Technique)
         fmt.Printf("Points restants à distribuer : %d\n", pointsRestants)
 
-        // Distribution par stat avec limite de 5 par stat
-        pointsVitesse := demanderPoints("Vitesse", pointsRestants)
+        // Distribution par stat avec limite de 5 par stat ET cap à 100
+        pointsVitesse := demanderPointsAvecCap("Vitesse", pointsRestants, j.Vitesse)
         pointsRestants -= pointsVitesse
         j.Vitesse += pointsVitesse
 
         if pointsRestants > 0 {
-            pointsEndurance := demanderPoints("Endurance", pointsRestants)
+            pointsEndurance := demanderPointsAvecCap("Endurance", pointsRestants, j.Endurance)
             pointsRestants -= pointsEndurance
             j.Endurance += pointsEndurance
         }
 
         if pointsRestants > 0 {
-            pointsForce := demanderPoints("Force", pointsRestants)
+            pointsForce := demanderPointsAvecCap("Force", pointsRestants, j.Force)
             pointsRestants -= pointsForce
             j.Force += pointsForce
         }
 
         if pointsRestants > 0 {
-            pointsTechnique := demanderPoints("Technique", pointsRestants)
+            pointsTechnique := demanderPointsAvecCap("Technique", pointsRestants, j.Technique)
             pointsRestants -= pointsTechnique
             j.Technique += pointsTechnique
         }
@@ -305,12 +304,26 @@ func DistribuerPointsJoueurs(db *sql.DB, matchID int, idCesi int) {
     fmt.Println("\nTous les points ont été distribués.")
 }
 
+
 // Demande d'attribution de points pour une stat donnée (max 5)
-func demanderPoints(nomStat string, pointsDisponibles int) int {
+// Demande d'attribution de points pour une stat donnée (max 5) ET cap à 100
+func demanderPointsAvecCap(nomStat string, pointsDisponibles int, valeurActuelle int) int {
     var points int
     maxPoints := 5
     if pointsDisponibles < maxPoints {
         maxPoints = pointsDisponibles
+    }
+
+    // Calculer combien on peut encore ajouter sans dépasser 100
+    maxPossible := 100 - valeurActuelle
+    if maxPossible < maxPoints {
+        maxPoints = maxPossible
+    }
+
+    // Si la stat est déjà à 100, on ne peut rien ajouter
+    if maxPoints <= 0 {
+        fmt.Printf("%s est déjà au maximum (100), aucun point à ajouter.\n", nomStat)
+        return 0
     }
 
     for {
@@ -327,7 +340,7 @@ func demanderPoints(nomStat string, pointsDisponibles int) int {
 // Insérer le format aléatoire de blessure
 
 func eloUpdate(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv int) {
-    // recup score global : 
+    // recup score global :
 
     var levelCESI float64
     var levelADV float64
@@ -360,7 +373,7 @@ func eloUpdate(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv in
     }
 
 
-    // -- Proba que CESI gagne : 
+    // -- Proba que CESI gagne :
 
     var base float64
     base = 10
@@ -370,13 +383,13 @@ func eloUpdate(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv in
 
     probaEquipeCesiWin = 1/(1+result)
 
-    // -- Proba que ADV gagne : 
+    // -- Proba que ADV gagne :
 
     probaEquipeAdvWin = 1-probaEquipeCesiWin
 
     fmt.Println("Proba CESI win : ", probaEquipeCesiWin, " vs ", probaEquipeAdvWin)
 
-    // -- Resultat Float : 
+    // -- Resultat Float :
     if scoreCesi > scoreAdv {
         resultatReelCesi = 1
     } else if scoreCesi < scoreAdv {
@@ -400,7 +413,7 @@ func eloUpdate(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv in
     eloCesiFinal = int(math.Round(resultatEloCesi))
     eloAdvFinal = int(math.Round(resultatEloAdv))
 
-    // -- push sur la BDD : 
+    // -- push sur la BDD :
 
     _, err = db.Exec(`
         UPDATE equipe
@@ -420,10 +433,10 @@ func eloUpdate(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv in
         fmt.Println("Erreur lors de la mise à jour du ELO equipe adverse :", err)
         return
     }
-}   
+}
 
 func randomBlessure(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreAdv int) {
-    
+
     // -- Choisir un player random
 
     var idJoueurPick int
@@ -448,7 +461,7 @@ func randomBlessure(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreA
 	var force int
 	var technique int
     var prenomJoueur string
-    var nomJoueur string 
+    var nomJoueur string
 
     err = db.QueryRow(`
 		SELECT vitesse, endurance, force, technique, prenom_joueur, nom_joueur FROM joueur j
@@ -490,7 +503,7 @@ func randomBlessure(db *sql.DB, idCesi int, idAdverse int, scoreCesi int, scoreA
             fmt.Println("Erreur lors de la mise à jour du joueur pour sa blessure :", err)
             return
         }
-        
+
     } else { fmt.Println("Aucune Blessure durant ce match.") }
 
 }
