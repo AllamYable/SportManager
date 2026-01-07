@@ -6,6 +6,9 @@ import (
 )
 
 func DisplayModifierEquipe(db *sql.DB) {
+
+	erreurText := "Option non valide !"
+
 	var answer int
 
 	prenomJoueurAtk1 := "J1"
@@ -133,7 +136,7 @@ func DisplayModifierEquipe(db *sql.DB) {
 			if answer==idAtk1 || answer==idAtk2 || answer==idDef1 || answer==idDef2 || answer==idGoal && err != nil {
 				valid = true
 			} 
-			if !valid {fmt.Println("Option non valide !")}
+			if !valid {fmt.Println(erreurText)}
 		}
 		valid = false
 
@@ -144,7 +147,7 @@ func DisplayModifierEquipe(db *sql.DB) {
 			if answer==idAtk1 || answer==idAtk2 || answer==idDef1 || answer==idDef2 || answer==idGoal && err != nil {
 				valid = true
 			} 
-			if !valid {fmt.Println("Option non valide !")}
+			if !valid {fmt.Println(erreurText)}
 		}
 
 

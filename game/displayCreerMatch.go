@@ -15,6 +15,8 @@ type Equipe struct {
     Nom string
 }
 
+erreurText := "Option non valide !"
+
 func ObtenirEquipesAdverses(db *sql.DB) ([]Equipe, error) {
     rows, err := db.Query(`
         SELECT id_equipe, nom_equipe
@@ -172,7 +174,7 @@ func SaisirScoreMatch(db *sql.DB, matchID int, idCesi int, idAdverse int) {
         fmt.Print("Score équipe adverse : ")
         _, err := fmt.Scan(&scoreAdv)
         if err != nil {
-            fmt.Println("Ce n'est pas un entier valide !")
+            fmt.Println(erreurText)
 	    } else {
             valid = true
         }
@@ -331,7 +333,7 @@ func demanderPointsAvecCap(nomStat string, pointsDisponibles int, valeurActuelle
             fmt.Printf("Points à ajouter à %s (0-%d) : ", nomStat, maxPoints)
             _, err := fmt.Scan(&points)
             if err != nil {
-                fmt.Println("Ce n'est pas un entier valide !")
+                fmt.Println(erreurText)
             } else {
                 valid = true
             }

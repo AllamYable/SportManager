@@ -17,6 +17,8 @@ type Joueur struct {
     Blesse    bool
 }
 
+erreurText := "Option non valide !"
+
 // Requete de selection pour obtenir les joueurs de l'equipe CESI
 
 func ObtenirJoueursCesi(db *sql.DB) ([]Joueur, error) {
@@ -113,7 +115,7 @@ func ModifierStatsJoueur(db *sql.DB, joueurs []Joueur, id int)  {
             if nouvelleValeur>=0 && nouvelleValeur<=100 && err != nil {
                 valid = true
             } 
-            if !valid {fmt.Println("Option non valide !")}
+            if !valid {fmt.Println(erreurText)}
         }
 
         
@@ -176,7 +178,7 @@ func DisplayModifierJoueur(db *sql.DB) int {
 				break
 			}
 		}
-        if !valid {fmt.Println("Option non valide !")}
+        if !valid {fmt.Println(erreurText)}
     }
 
     ModifierStatsJoueur(db, joueurs, answer)
