@@ -15,8 +15,6 @@ type Equipe struct {
     Nom string
 }
 
-erreurText := "Option non valide !"
-
 func ObtenirEquipesAdverses(db *sql.DB) ([]Equipe, error) {
     rows, err := db.Query(`
         SELECT id_equipe, nom_equipe
@@ -151,6 +149,7 @@ func DisplayCreationMatch(db *sql.DB) {
 
 // Saisie du score : CESI à gauche, adverse à droite, puis UPDATE du match
 func SaisirScoreMatch(db *sql.DB, matchID int, idCesi int, idAdverse int) {
+    erreurText := "Option non valide !"
     var scoreCesi, scoreAdv int
 
     fmt.Printf("\nEntrez le score sous la forme CESI - Adversaire\n")
@@ -308,6 +307,7 @@ func DistribuerPointsJoueurs(db *sql.DB, matchID int, idCesi int) {
 // Demande d'attribution de points pour une stat donnée (max 5)
 // Demande d'attribution de points pour une stat donnée (max 5) ET cap à 100
 func demanderPointsAvecCap(nomStat string, pointsDisponibles int, valeurActuelle int) int {
+    erreurText := "Option non valide !"
     var points int
     maxPoints := 5
     if pointsDisponibles < maxPoints {
