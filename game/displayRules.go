@@ -4,8 +4,7 @@ import (
 		"fmt"
 )
 
-func DisplayRules() int {
-	var answer int
+func DisplayRules() {
 	regles := `
     ____________________________
   / \                           \ .
@@ -35,7 +34,5 @@ func DisplayRules() int {
 `
 
 	fmt.Println(regles)
-	fmt.Scan(&answer)
 
-	return answer
 }

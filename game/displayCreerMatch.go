@@ -1,36 +1,12 @@
 package game
 
 import (
-    "database/sql"
-    "fmt"
-    "math"
-    "math/rand"
-    "time"
+	"database/sql"
+	"fmt"
+	"math"
+	"math/rand"
+	"time"
 )
-
-// --- Menu ASCII + déclenchement de la création de match ---
-func DisplayCreerMatch(db *sql.DB) {
-    var answer int
-    optionJouer := `
-    +-------------------------------------------------------------+
-    |                            MENU                             |
-    +-------------------------------------------------------------+
-    |    Jouer   ══════╗                                          |
-    |    Option        ▼                                          |
-    |    À Propos      Créer un match !  ════════════════╗        |
-    |    Sortir        Consulter son équipe              ▼        |
-    |                  Retour au menu          1. Créer un match  |
-    |                                          2. Retour jouer    |
-    +-------------------------------------------------------------+
-    `
-
-    fmt.Println(optionJouer)
-    fmt.Scan(&answer)
-
-    if answer == 1 {
-        DisplayCreationMatch(db)
-    }
-}
 
 // Structure et fonctions BDD pour la création du match
 
@@ -133,19 +109,20 @@ func DisplayCreationMatch(db *sql.DB) {
     }
 
     var idAdverse int
-    fmt.Print("Entrez l'ID de l'équipe adverse : ")
-    fmt.Scan(&idAdverse)
 
-    existe := false
-    for _, e := range equipes {
-        if e.ID == idAdverse {
-            existe = true
-            break
-        }
-    }
-    if !existe {
-        fmt.Println("ID d'équipe adverse invalide.")
-        return
+    valid := false
+
+    for !valid {
+        fmt.Print("Entrez l'ID de l'équipe adverse : ")
+        fmt.Scan(&idAdverse)
+
+        for _, e := range equipes {
+            if e.ID == idAdverse {
+                valid = true
+                break
+            }  
+        } 
+        if !valid {fmt.Println("ID d'équipe adverse invalide !")}
     }
 
     // Création du match avec scores de base à 0
@@ -175,10 +152,31 @@ func SaisirScoreMatch(db *sql.DB, matchID int, idCesi int, idAdverse int) {
     var scoreCesi, scoreAdv int
 
     fmt.Printf("\nEntrez le score sous la forme CESI - Adversaire\n")
-    fmt.Print("Score CESI : ")
-    fmt.Scan(&scoreCesi)
-    fmt.Print("Score équipe adverse : ")
-    fmt.Scan(&scoreAdv)
+
+    valid := false
+
+    for !valid {
+        fmt.Print("Score CESI : ")
+        _, err := fmt.Scan(&scoreCesi)
+        if err != nil {
+            fmt.Println("Ce n'est pas un entier valide !")
+	    } else {
+            valid = true
+        }
+    }
+
+    valid = false
+
+
+    for !valid {
+        fmt.Print("Score équipe adverse : ")
+        _, err := fmt.Scan(&scoreAdv)
+        if err != nil {
+            fmt.Println("Ce n'est pas un entier valide !")
+	    } else {
+            valid = true
+        }
+    }
 
     // Déterminer le gagnant (id équipe) ou NULL en cas de nul
     var gagnant interface{}
@@ -327,8 +325,17 @@ func demanderPointsAvecCap(nomStat string, pointsDisponibles int, valeurActuelle
     }
 
     for {
-        fmt.Printf("Points à ajouter à %s (0-%d) : ", nomStat, maxPoints)
-        fmt.Scan(&points)
+        valid := false
+
+        for !valid {
+            fmt.Printf("Points à ajouter à %s (0-%d) : ", nomStat, maxPoints)
+            _, err := fmt.Scan(&points)
+            if err != nil {
+                fmt.Println("Ce n'est pas un entier valide !")
+            } else {
+                valid = true
+            }
+        }
 
         if points >= 0 && points <= maxPoints {
             return points

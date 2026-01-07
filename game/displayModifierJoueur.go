@@ -85,18 +85,39 @@ func ModifierStatsJoueur(db *sql.DB, joueurs []Joueur, id int)  {
         fmt.Printf("3) Force      : %d\n", joueur.Force)
         fmt.Printf("4) Technique  : %d\n", joueur.Technique)
         fmt.Println("5) Terminer")
-        fmt.Print("Choisissez la stat à modifier : ")
+        
 
         var choix int
-        fmt.Scan(&choix)
+        valid := false
+
+        for !valid {
+            fmt.Print("Choisissez la stat à modifier : ")
+            _, err := fmt.Scan(&choix)
+            if choix==1 || choix==2 || choix==3 || choix==4 || choix==5 && err != nil {
+                valid = true
+            } 
+            if !valid {fmt.Println("Option non valide !")}
+        }
+        valid = false
 
         if choix == 5 {
             break
         }
 
+
         var nouvelleValeur int
-        fmt.Print("Nouvelle valeur (0-100) : ")
-        fmt.Scan(&nouvelleValeur)
+
+        for !valid {
+            fmt.Print("Nouvelle valeur (0-100) : ")
+            _, err := fmt.Scan(&nouvelleValeur)
+            if nouvelleValeur>=0 && nouvelleValeur<=100 && err != nil {
+                valid = true
+            } 
+            if !valid {fmt.Println("Option non valide !")}
+        }
+
+        
+        
 
         switch choix {
         case 1:
@@ -141,8 +162,22 @@ func DisplayModifierJoueur(db *sql.DB) int {
     }
 
     var answer int
-    fmt.Println("Rentrez l'id du joueur que vous voulez modifier")
-    fmt.Scan(&answer)
+
+
+    // 
+    valid := false
+    for !valid {
+        fmt.Println("Rentrez l'id du joueur que vous voulez modifier :")
+        _, err := fmt.Scan(&answer)
+
+        for i := 0; i < len(joueurs); i++ {
+			if answer == joueurs[i].ID && err != nil {
+				valid = true
+				break
+			}
+		}
+        if !valid {fmt.Println("Option non valide !")}
+    }
 
     ModifierStatsJoueur(db, joueurs, answer)
 

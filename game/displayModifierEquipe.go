@@ -102,9 +102,18 @@ func DisplayModifierEquipe(db *sql.DB) {
                        └─`+prenomJoueurAtk2+` `+nomJoueurAtk2+`
   `
 
-	fmt.Println(base)
-	fmt.Printf("\n \n 1. Switch 2 joueurs \n 2. Retour \n > ")
-	fmt.Scan(&answer)
+	valid := false
+
+	for !valid {
+		fmt.Println(base)
+		fmt.Printf("\n \n 1. Switch 2 joueurs \n 2. Retour \n > ")
+		_, err := fmt.Scan(&answer)
+		if (answer == 1) || (answer == 2) && (err == nil) {
+			valid = true
+		} 
+		if !valid {fmt.Println("Option non valide !")}
+	}
+
 
 	if answer == 1 {
 		fmt.Printf("\nVoici la liste des joueurs : \n")
@@ -115,12 +124,30 @@ func DisplayModifierEquipe(db *sql.DB) {
 		fmt.Printf("Defenseur 2 : %s %s | ID: %v \n", prenomJoueurDef2, nomJoueurDef2, idDef2)
 		fmt.Printf("Goal : %s %s | ID: %v \n\n", prenomJoueurGoal, nomJoueurGoal, idGoal)
 
-		fmt.Println("Entrez l'ID du 1er joueur : ")
+		valid := false
 		var id1 int
-		fmt.Scan(&id1)
-		fmt.Println("Entrez l'ID du 2eme joueur : ")
+
+		for !valid {
+			fmt.Println("Entrez l'ID du 1er joueur : ")
+			_, err := fmt.Scan(&id1)
+			if answer==idAtk1 || answer==idAtk2 || answer==idDef1 || answer==idDef2 || answer==idGoal && err != nil {
+				valid = true
+			} 
+			if !valid {fmt.Println("Option non valide !")}
+		}
+		valid = false
+
 		var id2 int
-		fmt.Scan(&id2)
+		for !valid {
+			fmt.Println("Entrez l'ID du 2eme joueur : ")
+			_, err := fmt.Scan(&id2)
+			if answer==idAtk1 || answer==idAtk2 || answer==idDef1 || answer==idDef2 || answer==idGoal && err != nil {
+				valid = true
+			} 
+			if !valid {fmt.Println("Option non valide !")}
+		}
+
+
 		fmt.Printf("Echange : J%v <=> J%v \n", id1, id2)
 		if id1 == id2 {
 			fmt.Println("Erreur : Vous avez entré le même ID pour les deux joueurs.")

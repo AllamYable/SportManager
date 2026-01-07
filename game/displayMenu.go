@@ -17,8 +17,16 @@ func DisplayMenu() int {
     +--------------------------+
     `
 
-	fmt.Println(menu)
-	fmt.Scan(&answer)
+	valid := false
+
+	for !valid {
+		fmt.Println(menu)
+		_, err := fmt.Scan(&answer)
+		if (answer == 1) || (answer == 2) || (answer == 3) || (answer == 4) && (err == nil) {
+			valid = true
+		} 
+		if !valid {fmt.Println("Option non valide !")}
+	}
 
 	return answer
 }

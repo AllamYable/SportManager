@@ -33,7 +33,7 @@ func main() {
             case 1:
                 fmt.Println("> Création d'un MATCH")
                 // -- Création d'un match (menu ASCII + choix équipe adverse + insertion en BDD)
-                game.DisplayCreerMatch(db)
+                game.DisplayCreationMatch(db)
 
             case 2:
                 fmt.Println("> Gestion de l'équipe")
@@ -55,8 +55,6 @@ func main() {
             answer = game.DisplayOptions()
             switch answer {
             case 1:
-                fmt.Println("> Ouverture de l'historique...")
-            case 2:
                 fmt.Println("> Reset de la BDD...")
                 err = database.ResetDatabase(db)
                 if err != nil {

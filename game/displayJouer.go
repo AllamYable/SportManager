@@ -18,9 +18,17 @@ func DisplayJouer() int {
 	|                                        |
 	+----------------------------------------+
 	`
+	
+	valid := false
 
-	fmt.Println(optionJouer)
-	fmt.Scan(&answer)
+	for !valid {
+		fmt.Println(optionJouer)
+		_, err := fmt.Scan(&answer)
+		if (answer == 1) || (answer == 2) || (answer == 3) && (err == nil) {
+			valid = true
+		} 
+		if !valid {fmt.Println("Option non valide !")}
+	}
 
 	return answer
 }
