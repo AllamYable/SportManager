@@ -94,7 +94,7 @@ func ModifierStatsJoueur(db *sql.DB, joueurs []Joueur, id int)  {
         for !valid {
             fmt.Print("Choisissez la stat à modifier : ")
             _, err := fmt.Scan(&choix)
-            if choix==1 || choix==2 || choix==3 || choix==4 || choix==5 && err != nil {
+            if choix==1 || choix==2 || choix==3 || choix==4 || choix==5 && err == nil {
                 valid = true
             } 
             if !valid {fmt.Println("Option non valide !")}
@@ -111,7 +111,7 @@ func ModifierStatsJoueur(db *sql.DB, joueurs []Joueur, id int)  {
         for !valid {
             fmt.Print("Nouvelle valeur (0-100) : ")
             _, err := fmt.Scan(&nouvelleValeur)
-            if nouvelleValeur>=0 && nouvelleValeur<=100 && err != nil {
+            if nouvelleValeur>=0 && nouvelleValeur<=100 && err == nil {
                 valid = true
             } 
             if !valid {fmt.Println(erreurText)}
@@ -173,7 +173,7 @@ func DisplayModifierJoueur(db *sql.DB) int {
         _, err := fmt.Scan(&answer)
 
         for i := 0; i < len(joueurs); i++ {
-			if answer == joueurs[i].ID && err != nil {
+			if answer == joueurs[i].ID && err == nil {
 				valid = true
 				break
 			}

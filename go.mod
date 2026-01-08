@@ -2,10 +2,7 @@ module sportmanager
 
 go 1.25.2
 
-require (
-	golang.org/x/tools v0.36.0
-	modernc.org/sqlite v1.40.1
-)
+require modernc.org/sqlite v1.40.1
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

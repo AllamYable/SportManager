@@ -133,7 +133,7 @@ func DisplayModifierEquipe(db *sql.DB) {
 		for !valid {
 			fmt.Println("Entrez l'ID du 1er joueur : ")
 			_, err := fmt.Scan(&id1)
-			if answer==idAtk1 || answer==idAtk2 || answer==idDef1 || answer==idDef2 || answer==idGoal && err != nil {
+			if answer==idAtk1 || answer==idAtk2 || answer==idDef1 || answer==idDef2 || answer==idGoal && err == nil {
 				valid = true
 			} 
 			if !valid {fmt.Println(erreurText)}
@@ -144,7 +144,7 @@ func DisplayModifierEquipe(db *sql.DB) {
 		for !valid {
 			fmt.Println("Entrez l'ID du 2eme joueur : ")
 			_, err := fmt.Scan(&id2)
-			if answer==idAtk1 || answer==idAtk2 || answer==idDef1 || answer==idDef2 || answer==idGoal && err != nil {
+			if answer==idAtk1 || answer==idAtk2 || answer==idDef1 || answer==idDef2 || answer==idGoal && err == nil {
 				valid = true
 			} 
 			if !valid {fmt.Println(erreurText)}
